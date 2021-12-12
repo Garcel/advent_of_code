@@ -21,14 +21,16 @@ def puzzle2(input_file: typing.TextIO):
     return len([path for path in paths if path.contains_small_caves()])
 
 
-class Node:
+class Node(object):
     name: str
+    is_small_cave: bool
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
+        self.is_small_cave = name.islower()
 
     def is_small(self) -> bool:
-        return self.name.islower()
+        return self.is_small_cave
 
     def is_start(self) -> bool:
         return self.name == 'start'
@@ -52,31 +54,23 @@ def parse_row(row: str) -> (Node, Node):
     return Node(nodes[0]), Node(nodes[1])
 
 
-class Path:
+class Path(object):
     nodes: [Node]
-    count: {Node, int}
+    visited_twice: typing.Union[Node, None]
 
     def __init__(self):
         self.nodes = []
-        self.count = {}
+        self.visited_twice = None
 
     def __str__(self):
         return str([node.name for node in self.nodes])
-
-    def __eq__(self, other):
-        return self.nodes == other.nodes
-
-    def __hash__(self):
-        return hash(tuple(self.nodes))
 
     def add(self, node: Node) -> bool:
         if not self.can_be_visited(node):
             return False
 
-        if node in self.count:
-            self.count[node] += 1
-        else:
-            self.count[node] = 1
+        if node.is_small() and node in self.nodes:
+            self.visited_twice = node
 
         self.nodes.append(node)
 
@@ -84,15 +78,16 @@ class Path:
 
     def pop(self):
         node = self.nodes.pop()
-        self.count[node] -= 1
 
-        return node
+        if node.is_small() and self.visited_twice is not None and self.visited_twice.name == node.name:
+            self.visited_twice = None
 
     def contains_small_caves(self) -> bool:
-        return any([node.is_small() for node in self.nodes])
+        for node in self.nodes:
+            if node.is_small:
+                return True
 
-    def contains_small_cave_visited_twice(self) -> bool:
-        return any([count > 1 for node, count in self.count.items() if node.is_small()])
+        return False
 
     def can_be_visited(self, node: Node) -> bool:
         if not node.is_small():
@@ -101,10 +96,22 @@ class Path:
         if (node.is_start() or node.is_end()) and node in self.nodes:
             return False
 
-        return node not in self.nodes or not self.contains_small_cave_visited_twice()
+        return self.visited_twice is None or node not in self.nodes
+
+    def __copy__(self, memodict={}):
+        copy = Path()
+        copy.nodes = self.nodes
+
+        return copy
+
+    def __deepcopy__(self, memodict={}):
+        copy = Path()
+        copy.nodes = self.nodes[:]
+
+        return copy
 
 
-class CavesMap:
+class CavesMap(object):
     points: {str: Node}
     edges: {str: [Node]}
 
@@ -127,7 +134,7 @@ class CavesMap:
                 self.edges[edge[1].name] = [edge[0]]
 
     def find_paths(self) -> [Path]:
-        paths = set()
+        paths = []
 
         start = self.points['start']
 
@@ -135,7 +142,7 @@ class CavesMap:
 
         return paths
 
-    def _find_paths(self, current: Node, paths: set[Path], path: Path = None):
+    def _find_paths(self, current: Node, paths: [Path], path: Path = None):
         if path is None:
             path = Path()
 
@@ -143,7 +150,7 @@ class CavesMap:
             return
 
         if current.is_end():
-            paths.add(deepcopy(path))
+            paths.append(deepcopy(path))
             path.pop()
             return
 
