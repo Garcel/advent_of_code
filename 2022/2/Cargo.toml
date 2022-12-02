@@ -1,0 +1,10 @@
+[package]
+name = "aoc_rust_2022_2"
+version = "1.0.0"
+authors = ["https://github.com/Garcel"]
+edition = "2021"
+
+[[bench]]
+name = "bench"
+path = "src/bench.rs"
+harness = false
