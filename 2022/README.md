@@ -3,7 +3,7 @@
 
 My solutions for [Adven of Code 2022](https://adventofcode.com/) written in Rust.
 
-I'm just starting tio learn 📖 this language, so maybe I'm not very proficient with it, so any tips would be welcome. Just be kind :)
+I'm just starting tio learn 📖 this language, so maybe I'm not very proficient with it. Any tips would be welcome. Just be kind :)
 
 ## Timings
 Times after 1000 iterations:
