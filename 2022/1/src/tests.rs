@@ -15,7 +15,6 @@ fn test_part_one() {
 #[test]
 fn test_part_two_demo() {
     let input = include_str!("../input/demo.txt");
-
     assert_eq!(part_two(&input), 45000);
 }
 

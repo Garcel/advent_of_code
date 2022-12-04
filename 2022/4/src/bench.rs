@@ -1,4 +1,5 @@
-mod puzzle;
+mod puzzle_part_one;
+mod puzzle_part_two;
 
 const ITERATIONS: u64 = 1000;
 
@@ -10,12 +11,12 @@ pub fn main() {
 }
 
 fn bench_part_one(input: &&str) {
-    let time = bench(&puzzle::part_one, &input);
+    let time = bench(&puzzle_part_one::resolve, &input);
     println!("Part One took {:.3} milliseconds.", time);
 }
 
 fn bench_part_two(input: &&str) {
-    let time = bench(&puzzle::part_two, &input);
+    let time = bench(&puzzle_part_two::resolve, &input);
     println!("Part Two took {:.3} milliseconds.", time);
 }
 
